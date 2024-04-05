@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main>
+        <section id="recipe-form">
+            <h2>Add New Recipe</h2>
+            <form id="new-recipe-form">
+                <label for="recipe-name">Name:</label>
+                <input type="text" id="recipe-name" name="name" required>
+                <label for="recipe-description">Description:</label>
+                <input type="text" id="recipe-description" name="description" required>
+                <label for="recipe-ingredients">Ingredients:</label>
+                <textarea id="recipe-ingredients" name="ingredients" rows="4" required></textarea>
+                <label for="recipe-serves">Serves:</label>
+                <input type="number" id="recipe-serves" name="serves" required>
+                <label for="recipe-allergens">Allergens:</label>
+                <input type="text" id="recipe-allergens" name="allergens">
+                <label for="recipe-diet-regular">Diet:</label>
+                <input type="radio" id="recipe-diet-regular" name="diet" value="regular" checked>
+                <label for="recipe-diet-regular">Regular</label>
+                <input type="radio" id="recipe-diet-vegetarian" name="diet" value="vegetarian">
+                <label for="recipe-diet-vegetarian">Vegetarian</label>
+                <label for="recipe-student-friendly">Student Friendly:</label>
+                <input type="checkbox" id="recipe-student-friendly" name="studentFriendly">
+                <label for="recipe-origin">Origin:</label>
+                <select id="recipe-origin" name="origin">
+                    <option value="dk">Denmark</option>
+                    <option value="swe">Sweden</option>
+                    <option value="noe">Norway</option>
+                </select>
+                <button type="submit">Add Recipe</button>
+            </form>
+        </section>
+        <section id="recipe-cards">
+            <h1>Recipes</h1>
+        </section>
+    </main>
+    <script>
+        document.getElementById('new-recipe-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('recipe-name').value;
+            const description = document.getElementById('recipe-description').value;
+            const ingredients = document.getElementById('recipe-ingredients').value;
+            const serves = parseInt(document.getElementById('recipe-serves').value);
+            const allergens = document.getElementById('recipe-allergens').value;
+            const diet = document.querySelector('input[name="diet"]:checked').value;
+            const studentFriendly = document.getElementById('recipe-student-friendly').checked;
+            const origin = document.getElementById('recipe-origin').value;
+            const data = {
+                name: name,
+                description: description,
+                ingredients: ingredients,
+                serves: serves,
+                allergens: allergens,
+                diet: diet,
+                student_friendly: studentFriendly,
+                origin: origin
+            };
+            fetch('https://uukenmqlormrhiapsuyh.supabase.co/rest/v1/Mad projekt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1a2VubXFsb3JtcmhpYXBzdXloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA3NTE3ODEsImV4cCI6MjAyNjMyNzc4MX0.xNxmSX6LISR2RfPKUGopFsK1WjrY4AhFbduCSlN04XM'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            document.getElementById('new-recipe-form').reset();
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchRecipes();
+        });
+        function fetchRecipes() {
+            fetch('https://uukenmqlormrhiapsuyh.supabase.co/rest/v1/Mad projekt', {
+                method: 'GET',
+                headers: {
+                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1a2VubXFsb3JtcmhpYXBzdXloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA3NTE3ODEsImV4cCI6MjAyNjMyNzc4MX0.xNxmSX6LISR2RfPKUGopFsK1WjrY4AhFbduCSlN04XM'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('recipe-cards').innerHTML = '';
+                    data.forEach(recipe => {
+                        const card = document.createElement('div');
+                        card.classList.add('recipe-card');
+                        card.innerHTML = `
+                            <h3>${recipe.name}</h3>
+                            <p><strong>Description:</strong> ${recipe.description}</p>
+                            <p><strong>Ingredients:</strong> ${recipe.ingredients}</p>
+                            <p><strong>Serves:</strong> ${recipe.serves}</p>
+                            <p><strong>Allergens:</strong> ${recipe.allergens}</p>
+                            <p><strong>Diet:</strong> ${recipe.diet}</p>
+                            <p><strong>Student Friendly:</strong> ${recipe.student_friendly ? 'Yes' : 'No'}</p>
+                            <p><strong>Origin:</strong> ${recipe.origin}</p>
+                        `;
+                        document.getElementById('recipe-cards').appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
